@@ -43,7 +43,7 @@ def get_contents(filename):
 	line_buffer = ''
 	begin = False
 	default_header = "##### This is the beginning of the header #####\n#\n" + '#' * 47
-	contents = {'header':'#'}
+	contents = {'header':default_header}
 	for line in file_in.readlines():
 		if not begin and re.search(r'^\s*#', line):
 			line_buffer += line
