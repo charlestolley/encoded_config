@@ -1,0 +1,1 @@
+The purpose of this file is to base64 encode a config file just so you don't have to open it up on your desktop where a random passerby can peer over your shoulder and see all your sensitive information
