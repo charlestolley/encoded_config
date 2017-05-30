@@ -1,12 +1,11 @@
 import base64
-from os.path import abspath
+from os.path import abspath, isfile
 import re
 import sys
 
 if __name__ != '__main__':
 	sys.exit()
 
-# use absolute paths
 ALLOWED_FILES = []
 
 def encode(infile, outfile=None):
@@ -97,6 +96,18 @@ def get_values(filename, var_name):
 				decoded_vals.append(val)
 	return decoded_vals
 
+def new(filename):
+	if isfile(filename):
+		print "Cannot create " + filename + " because it already exists"
+		return
+	with open(filename, 'w') as newfile:
+		pass
+	ALLOWED_FILES.append(abspath(filename))
+	header = get_contents(filename)['header']
+	write_to_file(filename, {}, header)
+	print "File successfully created!"
+	print "Add " + filename + " to ALLOWED_FILES in edit_config.py in order to edit it"
+
 def set_value(filename, var_name, value):
 	filename = abspath(filename)
 	if not filename in ALLOWED_FILES:
@@ -165,6 +176,9 @@ COMMANDS = {	"encode":	{	"func":		encode,
 								"usage":	"<in_file> [out_file]\n" +
 											"Accepts a config file of the appropriate format with\n" +
 											"contents in plain text and base64 encodes the values"},
+				"new":		{	"func":		new,
+								"usage":	"<filename>\n" +
+											"Creates a new empty config file"},
 				"set":		{	"func":		set_value, 
 								"usage":	"<file> <var_name> <value>\n" +
 											"base64 encodes the given value and writes it to var_name"},
