@@ -26,8 +26,7 @@ def encode(infile, outfile=None):
 	except IOError:
 		print "Could not open '" + infile + "' for reading\n"
 		return
-	header = contents['header']
-	contents.pop('header')
+	header = contents.pop('header')
 	for var_name in contents.keys():
 		if len(contents[var_name]) > 1:
 			print "Multiple declarations found for " + var_name
@@ -108,10 +107,28 @@ def new(filename):
 	print "File successfully created!"
 	print "Add " + filename + " to ALLOWED_FILES in edit_config.py in order to edit it"
 
+def remove(filename, var_name):
+	filename = abspath(filename)
+	if not filename in ALLOWED_FILES:
+		print "This script may only edit the following files:"
+		print ALLOWED_FILES
+		return
+	try:
+		contents = get_contents(filename)
+	except IOError:
+		print "Could not open '" + infile + "' for reading\n"
+		return
+	header = contents.pop('header')
+	if var_name in contents:
+		contents.pop(var_name)
+		write_to_file(filename, contents, header)
+	else:
+		print "Variable " + var_name + " does not exist"
+
 def set_value(filename, var_name, value):
 	filename = abspath(filename)
 	if not filename in ALLOWED_FILES:
-		print "This script may only edit the following file:"
+		print "This script may only edit the following files:"
 		print ALLOWED_FILES
 		return
 	if not re.search(r'^[A-Z_][A-Z0-9_]*$', var_name):
@@ -122,8 +139,7 @@ def set_value(filename, var_name, value):
 	except IOError:
 		print "Could not open '" + infile + "' for reading\n"
 		return
-	header = contents['header']
-	contents.pop('header')	
+	header = contents.pop('header')	
 	contents[var_name] = [{	'comments':'',
 							'value':'"'+base64.b64encode(value)+'"'}]
 	write_to_file(filename, contents, header)
@@ -153,7 +169,7 @@ def usage(command=None):
 	else:
 		print "<command> [args]\n"
 		print "Available commands are:"
-		for cmd in COMMANDS.keys():
+		for cmd in sorted(COMMANDS.keys()):
 			print cmd
 		print "You may enter a command without args to see its usage\n"
 
@@ -177,8 +193,11 @@ COMMANDS = {	"encode":	{	"func":		encode,
 											"Accepts a config file of the appropriate format with\n" +
 											"contents in plain text and base64 encodes the values"},
 				"new":		{	"func":		new,
-								"usage":	"<filename>\n" +
+								"usage":	"<file>\n" +
 											"Creates a new empty config file"},
+				"remove":	{	"func":		remove,
+								"usage":	"<file> <var_name>\n" +
+											"Deletes the variable <var_name> from <file>"},
 				"set":		{	"func":		set_value, 
 								"usage":	"<file> <var_name> <value>\n" +
 											"base64 encodes the given value and writes it to var_name"},
