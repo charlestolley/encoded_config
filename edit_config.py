@@ -8,6 +8,23 @@ if __name__ != '__main__':
 
 ALLOWED_FILES = []
 
+DEFAULT_HEADER = """\
+##################### Header #####################
+# Anything contained in this header will be pre-
+# served by edit_config.py as long as every line
+# begins with a single '#' symbol. A line
+# beginning with 2 or more '#' characters and
+# containing nothing else will be interpreted as
+# the end of the header.
+# 
+# Comments included anywhere else in the file are
+# associated with the variable that immediately
+# follows, and may be reformatted to reflect that
+# association. If a variable is removed, its
+# associated comments will also be removed.
+##################################################\
+"""
+
 def encode(infile, outfile=None):
 	infile = abspath(infile)
 	outfile = abspath(outfile) if outfile else infile
@@ -40,8 +57,7 @@ def get_contents(filename):
 
 	line_buffer = ''
 	begin = False
-	default_header = "##### This is the beginning of the header #####\n#\n" + '#' * 47
-	contents = {'header':default_header}
+	contents = {'header':DEFAULT_HEADER}
 	for line in file_in.readlines():
 		if not begin and re.search(r'^\s*#', line):
 			line_buffer += line
