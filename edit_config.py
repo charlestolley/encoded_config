@@ -28,12 +28,7 @@ DEFAULT_HEADER = """\
 def encode(infile, outfile=None):
 	infile = abspath(infile)
 	outfile = abspath(outfile) if outfile else infile
-	if not infile in ALLOWED_FILES:
-		print "Invalid attempt to edit '" + infile + "'"
-		print "This script may only edit the following files:"
-		print ALLOWED_FILES
-		return
-	elif not outfile in ALLOWED_FILES:
+	if not outfile in ALLOWED_FILES:
 		print "Invalid attempt to edit '" + outfile + "'"
 		print "This script may only edit the following files:"
 		print ALLOWED_FILES
