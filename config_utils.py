@@ -132,6 +132,3 @@ def write_to_file(filename, contents):
 				file_out.write('\n')
 			file_out.write('{0}="{1}"'.format(var, base64.b64encode(value)))
 			file_out.write('\n')
-
-if __name__ == '__main__':
-	pprint(get_contents('new_config.cfg'))
