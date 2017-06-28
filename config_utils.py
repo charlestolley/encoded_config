@@ -40,7 +40,8 @@ var_name_regex = re.compile(r'^[A-Z_][A-Z0-9_]*$')
 # It thereby accommodates the case where there are 
 # multiple copies of a variable with a single name;
 # even though such a case is not supported, it isn't
-# up to the get_contents function to discard information
+# up to the get_contents function to discard information.
+# Note that values are extracted, but not decoded by this function
 def get_contents(filename):
 	contents = {
 		'header': '',
@@ -70,7 +71,7 @@ def get_contents(filename):
 		declaration = re.search(declaration_regex, line)
 		if declaration:
 			var = declaration.group(1)
-			value = base64.b64decode(declaration.group(2))
+			value = declaration.group(2)
 			if not var in contents['vars']:
 				contents['vars'][var] = []
 			contents['vars'][var].append({'comments':line_buffer.strip(), 'value':value})
@@ -93,7 +94,7 @@ def get_value(filename, var_name):
 			while value is None:
 				declaration = re.search(declaration_regex, file_in.next())
 				if declaration and declaration.group(1) == var_name:
-					value = declaration.group(2)
+					value = base64.b64decode(declaration.group(2))
 		except StopIteration:
 			pass
 		return value
@@ -111,7 +112,7 @@ def set_value(filename, var_name, value):
 	contents['vars'][var_name] = [
 		{
 			'comments': '\n'.join(comments),
-			'value': value
+			'value': base64.b64encode(value)
 		}
 	]
 	write_to_file(filename, contents)
@@ -130,5 +131,5 @@ def write_to_file(filename, contents):
 				file_out.write('\n')
 				file_out.write(comments)
 				file_out.write('\n')
-			file_out.write('{0}="{1}"'.format(var, base64.b64encode(value)))
+			file_out.write('{0}="{1}"'.format(var, value))
 			file_out.write('\n')
