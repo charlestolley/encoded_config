@@ -141,7 +141,8 @@ def set_raw_value(filename, var_name, value):
 	comments = []
 	if var_name in contents['vars']:
 		for occurrence in contents['vars'][var_name]:
-			comments.append(occurrence['comments'])
+			if occurrence['comments']:
+				comments.append(occurrence['comments'])
 	contents['vars'][var_name] = [
 		{
 			'comments': '\n'.join(comments),
