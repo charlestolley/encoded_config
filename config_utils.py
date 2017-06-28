@@ -1,6 +1,5 @@
 import base64
 from os.path import isfile
-from pprint import pprint
 import re
 
 DEFAULT_HEADER = """\
@@ -30,11 +29,9 @@ def encode(infile, outfile=None):
 	if not outfile:
 		outfile = infile
 	contents = get_contents(infile)
-	print contents
 	for var in contents['vars']:
 		for occurrence in contents['vars'][var]:
 			occurrence['value'] = base64.b64encode(occurrence['value'])
-	print contents
 	write_to_file(outfile, contents)
 
 # Returns a dictionary of the following format
@@ -131,6 +128,8 @@ def get_raw_value(filename, var_name):
 			pass
 		return value
 
+# returns a list of all values assigned
+# to a given variable name
 def get_raw_values(filename, var_name):
 	contents = get_contents(filename)
 	if var_name in contents['vars']:
@@ -156,6 +155,9 @@ def remove(filename, var_name):
 	if var_name in contents['vars']:
 		contents['vars'].pop(var_name)
 		write_to_file(filename, contents)
+		return True
+	else:
+		return False
 
 # Overwrites previous value(s)
 def set_raw_value(filename, var_name, value):
