@@ -134,6 +134,8 @@ def get_raw_values(filename, var_name):
 	contents = get_contents(filename)
 	if var_name in contents['vars']:
 		return [occurrence['value'] for occurrence in contents['vars'][var_name]]
+	else:
+		return []
 
 def get_value(filename, var_name):
 	return base64.b64decode(get_raw_value(filename, var_name))
