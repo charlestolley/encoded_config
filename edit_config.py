@@ -3,6 +3,8 @@ from os.path import abspath, isfile
 import re
 import sys
 
+import config_utils
+
 if __name__ != '__main__':
 	sys.exit()
 
@@ -136,25 +138,6 @@ def remove(filename, var_name):
 	else:
 		print "Variable " + var_name + " does not exist"
 
-def set_value(filename, var_name, value):
-	filename = abspath(filename)
-	if not filename in ALLOWED_FILES:
-		print "This script may only edit the following files:"
-		print ALLOWED_FILES
-		return
-	if not re.search(r'^[A-Z_][A-Z0-9_]*$', var_name):
-		print "Variable name '" + var_name + "' does not match '[A-Z_][A-Z0-9_]*'"
-		return
-	try:
-		contents = get_contents(filename)
-	except IOError:
-		print "Could not open '" + infile + "' for reading\n"
-		return
-	header = contents.pop('header')	
-	contents[var_name] = [{	'comments':'',
-							'value':'"'+base64.b64encode(value)+'"'}]
-	write_to_file(filename, contents, header)
-
 def show(filename, var_name):
 	values = get_values(filename, var_name)
 	if not values:
@@ -209,7 +192,7 @@ COMMANDS = {	"encode":	{	"func":		encode,
 				"remove":	{	"func":		remove,
 								"usage":	"<file> <var_name>\n" +
 											"Deletes the variable <var_name> from <file>"},
-				"set":		{	"func":		set_value, 
+				"set":		{	"func":		config_utils.set_value, 
 								"usage":	"<file> <var_name> <value>\n" +
 											"base64 encodes the given value and writes it to var_name"},
 				"show":		{	"func":		show,
