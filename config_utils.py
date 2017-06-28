@@ -23,7 +23,7 @@ DEFAULT_HEADER = """\
 header_regex = re.compile(r'(?i)^#+\s*header\s*#+$')
 header_end_regex = re.compile(r'^#{2,}$')
 comment_regex = re.compile(r'^\s*(#.*?)\s*$')
-declaration_regex = re.compile(r'^\s*([A-Z][A-Z0-9_]*)\s*=\s*"([a-zA-Z0-9+\=]*)"\s*$')
+declaration_regex = re.compile(r'^\s*([A-Z][A-Z0-9_]*)\s*=\s*"(.*)"\s*$')
 var_name_regex = re.compile(r'^[A-Z_][A-Z0-9_]*$')
 
 # Returns a dictionary of the following format
@@ -59,7 +59,6 @@ var_name_regex = re.compile(r'^[A-Z_][A-Z0-9_]*$')
 # multiple copies of a variable with a single name;
 # even though such a case is not supported, it isn't
 # up to the get_contents function to discard information.
-# Note that values are extracted, but not decoded by this function
 def get_contents(filename):
 	contents = {
 		'header': '',
@@ -81,6 +80,7 @@ def get_contents(filename):
 				header += line + '\n'
 				if re.search(header_end_regex, line):
 					break
+		# still includes trailing newline, but that's actually okay
 		contents['header'] = header
 	else:
 		# need to get the first line back
@@ -106,7 +106,7 @@ def get_contents(filename):
 # Unlike get_contents, this function returns specifically
 # the first occurrence of the value in the config file.
 # This only matters if your config has duplicate names (which it shouldn't)
-def get_value(filename, var_name):
+def get_raw_value(filename, var_name):
 	if not re.search(var_name_regex, var_name):
 		raise ValueError("var_name must match '^[A-Z_][A-Z0-9_]*$'")
 	with open(filename, 'r') as file_in:
@@ -115,10 +115,13 @@ def get_value(filename, var_name):
 			while value is None:
 				declaration = re.search(declaration_regex, file_in.next())
 				if declaration and declaration.group(1) == var_name:
-					value = base64.b64decode(declaration.group(2))
+					value = declaration.group(2)
 		except StopIteration:
 			pass
 		return value
+
+def get_value(filename, var_name):
+	return base64.b64decode(get_raw_value(filename, var_name))
 
 # creates a new config file with default header
 # throws ValueError if the file already exists
@@ -130,7 +133,7 @@ def new(filename):
 	write_to_file(filename, contents)
 
 # Overwrites previous value(s)
-def set_value(filename, var_name, value):
+def set_raw_value(filename, var_name, value):
 	if not re.search(var_name_regex, var_name):
 		raise ValueError("var_name must match '^[A-Z_][A-Z0-9_]*$'")
 	contents = get_contents(filename)
@@ -142,10 +145,13 @@ def set_value(filename, var_name, value):
 	contents['vars'][var_name] = [
 		{
 			'comments': '\n'.join(comments),
-			'value': base64.b64encode(value)
+			'value': value
 		}
 	]
 	write_to_file(filename, contents)
+
+def set_value(filename, var_name, value):
+	set_raw_value(filename, var_name, base64.b64encode(value))
 
 # see get_contents for the formatting of <contents>
 def write_to_file(filename, contents):
