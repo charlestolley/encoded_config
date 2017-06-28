@@ -1,6 +1,4 @@
-import base64
 from os.path import abspath, isfile
-import re
 import sys
 
 import config_utils
@@ -9,23 +7,6 @@ if __name__ != '__main__':
 	sys.exit()
 
 ALLOWED_FILES = []
-
-DEFAULT_HEADER = """\
-##################### Header #####################
-# Anything contained in this header will be pre-
-# served by edit_config.py as long as every line
-# begins with a single '#' symbol. A line
-# beginning with 2 or more '#' characters and
-# containing nothing else will be interpreted as
-# the end of the header.
-# 
-# Comments included anywhere else in the file are
-# associated with the variable that immediately
-# follows, and may be reformatted to reflect that
-# association. If a variable is removed, its
-# associated comments will also be removed.
-##################################################\
-"""
 
 def encode(infile, outfile=None):
 	infile = abspath(infile)
