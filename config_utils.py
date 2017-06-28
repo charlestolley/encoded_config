@@ -6,7 +6,7 @@ header_regex = re.compile(r'(?i)^#+\s*header\s*#+$')
 header_end_regex = re.compile(r'^#{2,}$')
 comment_regex = re.compile(r'^\s*(#.*?)\s*$')
 declaration_regex = re.compile(r'^\s*([A-Z][A-Z0-9_]*)\s*=\s*"([a-zA-Z0-9+\=]*)"\s*$')
-var_name_regex = re.compile(r'^[A-Z][A-Z0-9_]*$')
+var_name_regex = re.compile(r'^[A-Z_][A-Z0-9_]*$')
 
 # Returns a dictionary of the following format
 #	{
@@ -86,7 +86,7 @@ def get_contents(filename):
 # This only matters if your config has duplicate names (which it shouldn't)
 def get_value(filename, var_name):
 	if not re.search(var_name_regex, var_name):
-		raise ValueError("var_name must match '^[A-Z][A-Z0-9_]*$'")
+		raise ValueError("var_name must match '^[A-Z_][A-Z0-9_]*$'")
 	with open(filename, 'r') as file_in:
 		value = None
 		try:
@@ -101,7 +101,7 @@ def get_value(filename, var_name):
 # Overwrites previous value(s)
 def set_value(filename, var_name, value):
 	if not re.search(var_name_regex, var_name):
-		raise ValueError("var_name must match '^[A-Z][A-Z0-9_]*$'")
+		raise ValueError("var_name must match '^[A-Z_][A-Z0-9_]*$'")
 	contents = get_contents(filename)
 	# preserve the comments for a variable
 	comments = []
