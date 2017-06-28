@@ -114,7 +114,7 @@ def get_contents(filename):
 	file_in.close()
 	return contents
 
-# Unlike get_contents, this function returns specifically
+# Unlike get_values, this function returns specifically
 # the first occurrence of the value in the config file.
 # This only matters if your config has duplicate names (which it shouldn't)
 def get_raw_value(filename, var_name):
@@ -131,8 +131,16 @@ def get_raw_value(filename, var_name):
 			pass
 		return value
 
+def get_raw_values(filename, var_name):
+	contents = get_contents(filename)
+	if var_name in contents['vars']:
+		return [occurrence['value'] for occurrence in contents['vars'][var_name]]
+
 def get_value(filename, var_name):
 	return base64.b64decode(get_raw_value(filename, var_name))
+
+def get_values(filename, var_name):
+	return [base64.b64decode(value) for value in get_raw_values(filename, var_name)]
 
 # creates a new config file with default header
 # throws ValueError if the file already exists

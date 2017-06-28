@@ -139,7 +139,7 @@ def remove(filename, var_name):
 		print "Variable " + var_name + " does not exist"
 
 def show(filename, var_name):
-	values = get_values(filename, var_name)
+	values = config_utils.get_values(filename, var_name)
 	if not values:
 		print "Variable '" + var_name + "' not found"
 	elif len(values) > 1:
@@ -148,12 +148,8 @@ def show(filename, var_name):
 		print var_name + "=" + val
 
 def show_all(filename):
-	try:
-		contents = get_contents(filename)
-	except IOError:
-		print "Could not open '" + filename + "' for reading\n"
-	contents.pop('header')
-	for var_name in sorted(contents.keys()):
+	contents = config_utils.get_contents(filename)
+	for var_name in sorted(contents['vars']):
 		print var_name
 
 def usage(command=None):
