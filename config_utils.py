@@ -126,7 +126,7 @@ def get_raw_value(filename, var_name):
 					value = declaration.group(2)
 		except StopIteration:
 			pass
-		return value
+		return value if value else ''
 
 # returns a list of all values assigned
 # to a given variable name
