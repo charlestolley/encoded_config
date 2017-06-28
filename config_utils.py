@@ -1,6 +1,24 @@
 import base64
+from os.path import isfile
 from pprint import pprint
 import re
+
+DEFAULT_HEADER = """\
+##################### Header #####################
+# Anything contained in this header will be pre-
+# served by edit_config.py as long as every line
+# begins with a single '#' symbol. A line
+# beginning with 2 or more '#' characters and
+# containing nothing else will be interpreted as
+# the end of the header.
+# 
+# Comments included anywhere else in the file are
+# associated with the variable that immediately
+# follows, and may be reformatted to reflect that
+# association. If a variable is removed, its
+# associated comments will also be removed.
+##################################################\
+"""
 
 header_regex = re.compile(r'(?i)^#+\s*header\s*#+$')
 header_end_regex = re.compile(r'^#{2,}$')
@@ -48,7 +66,10 @@ def get_contents(filename):
 		'vars': {}
 	}
 
-	file_in = open(filename, 'r')
+	try:
+		file_in = open(filename, 'r')
+	except IOError:
+		return contents
 
 	first_line = file_in.readline()
 	if re.search(header_regex, first_line):
@@ -98,6 +119,15 @@ def get_value(filename, var_name):
 		except StopIteration:
 			pass
 		return value
+
+# creates a new config file with default header
+# throws ValueError if the file already exists
+def new(filename):
+	if isfile(filename):
+		raise ValueError("Cannot create {} because it already exists".format(filename))
+	contents = get_contents(filename)
+	contents['header'] = DEFAULT_HEADER
+	write_to_file(filename, contents)
 
 # Overwrites previous value(s)
 def set_value(filename, var_name, value):
