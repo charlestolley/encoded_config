@@ -26,6 +26,17 @@ comment_regex = re.compile(r'^\s*(#.*?)\s*$')
 declaration_regex = re.compile(r'^\s*([A-Z][A-Z0-9_]*)\s*=\s*"(.*)"\s*$')
 var_name_regex = re.compile(r'^[A-Z_][A-Z0-9_]*$')
 
+def encode(infile, outfile=None):
+	if not outfile:
+		outfile = infile
+	contents = get_contents(infile)
+	print contents
+	for var in contents['vars']:
+		for occurrence in contents['vars'][var]:
+			occurrence['value'] = base64.b64encode(occurrence['value'])
+	print contents
+	write_to_file(outfile, contents)
+
 # Returns a dictionary of the following format
 #	{
 #		'header': <string>
@@ -162,11 +173,12 @@ def write_to_file(filename, contents):
 		if var_names and not contents['vars'][var_names[0]][0]['comments']:
 			file_out.write('\n')
 		for var in var_names:
-			comments = contents['vars'][var][0]['comments']
-			value = contents['vars'][var][0]['value']
-			if comments:
+			for occurrence in contents['vars'][var]:
+				comments = occurrence['comments']
+				value = occurrence['value']
+				if comments:
+					file_out.write('\n')
+					file_out.write(comments)
+					file_out.write('\n')
+				file_out.write('{0}="{1}"'.format(var, value))
 				file_out.write('\n')
-				file_out.write(comments)
-				file_out.write('\n')
-			file_out.write('{0}="{1}"'.format(var, value))
-			file_out.write('\n')
