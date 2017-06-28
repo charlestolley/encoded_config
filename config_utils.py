@@ -143,6 +143,12 @@ def new(filename):
 	contents['header'] = DEFAULT_HEADER
 	write_to_file(filename, contents)
 
+def remove(filename, var_name):
+	contents = get_contents(filename)
+	if var_name in contents['vars']:
+		contents['vars'].pop(var_name)
+		write_to_file(filename, contents)
+
 # Overwrites previous value(s)
 def set_raw_value(filename, var_name, value):
 	if not re.search(var_name_regex, var_name):
